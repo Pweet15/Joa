@@ -23,7 +23,7 @@ jobs:
           P=$(nproc); echo "cores $P"
           for i in $(seq 0 $((P-1))); do
             S=$(( ${{ matrix.job }}*100 + i + ${{ github.run_number }}*10000 ))
-            ./pst $S sol_$S.txt 780 > out_$S.txt &
+            ./pst $S sol_$S.txt $(cat lim.txt) > out_$S.txt &
           done
           wait || true
           cat out_*.txt
