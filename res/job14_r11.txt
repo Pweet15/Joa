@@ -1,0 +1,4 @@
+BEST 58 seed 111400 cb 3.4 steps 500170752
+BEST 57 seed 111401 cb 3.5 steps 494927872
+BEST 43 seed 111402 cb 3.6 steps 486539264
+BEST 30 seed 111403 cb 3.7 steps 486539264
