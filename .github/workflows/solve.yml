@@ -15,7 +15,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: data
-        run: cat parts/p* > cnf.gz && gunzip -f cnf.gz && head -1 cnf.txt
+        run: cat parts/p* | gunzip -c > cnf.txt && head -1 cnf.txt
       - name: build
         run: gcc -O3 -march=native -o pst ps.c -lm
       - name: solve
