@@ -1,0 +1,4 @@
+BEST 31 seed 11100 cb 3.8 steps 624951296
+BEST 21 seed 11101 cb 3.9 steps 638582784
+BEST 21 seed 11102 cb 4.0 steps 642777088
+BEST 17 seed 11103 cb 4.1 steps 638582784
