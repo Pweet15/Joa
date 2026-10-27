@@ -1,0 +1,4 @@
+BEST 26 seed 110100 cb 3.8 steps 491782144
+BEST 29 seed 110101 cb 3.9 steps 499122176
+BEST 23 seed 110102 cb 4.0 steps 497025024
+BEST 16 seed 110103 cb 4.1 steps 510656512
