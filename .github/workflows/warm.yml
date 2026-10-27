@@ -1,0 +1,47 @@
+name: warm
+on:
+  push:
+    branches: [warm]
+permissions:
+  contents: write
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        job: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19]
+    steps:
+      - uses: actions/checkout@v4
+      - name: build
+        run: gcc -O3 -march=native -o pst ps.c -lm
+      - name: wait for puzzle
+        run: |
+          START=$(date +%s)
+          while true; do
+            git fetch -q origin puzzle 2>/dev/null && git show origin/puzzle:stop.txt > stop.txt 2>/dev/null && [ "$(cat stop.txt)" -gt "$(date +%s)" ] && git show origin/puzzle:cnf.gz > cnf.gz 2>/dev/null && gunzip -t cnf.gz 2>/dev/null && break
+            [ $(( $(date +%s) - START )) -gt 2400 ] && exit 1
+            sleep 2
+          done
+          gunzip -c cnf.gz > cnf.txt; head -1 cnf.txt; echo "stop $(cat stop.txt) now $(date +%s)"
+      - name: solve
+        run: |
+          P=$(nproc); LIM=$(( $(cat stop.txt) - $(date +%s) )); echo "cores $P lim $LIM"
+          for i in $(seq 0 $((P-1))); do
+            S=$(( ${{ matrix.job }}*100 + i + ${{ github.run_number }}*10000 ))
+            ./pst $S sol_$S.txt $LIM > out_$S.txt &
+          done
+          for k in $(seq 1 $P); do wait -n || true; ls sol_*.txt >/dev/null 2>&1 && { pkill pst || true; break; }; done
+          cat out_*.txt
+      - name: report
+        if: always()
+        run: |
+          mkdir -p /tmp/res; cat out_*.txt > /tmp/res/job${{ matrix.job }}_w${{ github.run_number }}.txt 2>/dev/null; cp sol_*.txt /tmp/res/ 2>/dev/null || true
+          git config user.name bot; git config user.email bot@users.noreply.github.com
+          for n in 1 2 3 4 5 6 7 8; do
+            git fetch -q origin results && git checkout -qf -B results origin/results
+            mkdir -p res; cp /tmp/res/* res/
+            git add -f res/ && git commit -qm "w job ${{ matrix.job }}" && git push -q origin results && break
+            sleep $((RANDOM%5+1))
+          done
