@@ -23,9 +23,9 @@ jobs:
           P=$(nproc); echo "cores $P"
           for i in $(seq 0 $((P-1))); do
             S=$(( ${{ matrix.job }}*100 + i + ${{ github.run_number }}*10000 ))
-            ./pst $S sol_$S.txt $(cat lim.txt) > out_$S.txt &
+            ./pst $S sol_$S.txt 462 > out_$S.txt &
           done
-          wait || true
+          for k in $(seq 1 $P); do wait -n || true; ls sol_*.txt >/dev/null 2>&1 && { pkill pst || true; break; }; done
           cat out_*.txt
       - name: report
         if: always()
