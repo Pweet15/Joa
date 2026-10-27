@@ -1,0 +1,4 @@
+BEST 64 seed 110600 cb 3.4 steps 499122176
+BEST 47 seed 110601 cb 3.5 steps 506462208
+BEST 49 seed 110602 cb 3.6 steps 505413632
+BEST 32 seed 110603 cb 3.7 steps 504365056
