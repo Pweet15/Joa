@@ -1,0 +1,40 @@
+name: solve
+on:
+  push:
+    branches: [solver]
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        job: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19]
+    steps:
+      - uses: actions/checkout@v4
+      - name: data
+        run: cat parts/p* > cnf.gz && gunzip -f cnf.gz && head -1 cnf.txt
+      - name: build
+        run: gcc -O3 -march=native -o pst ps.c -lm
+      - name: solve
+        run: |
+          P=$(nproc); echo "cores $P"
+          for i in $(seq 0 $((P-1))); do
+            S=$(( ${{ matrix.job }}*100 + i + ${{ github.run_number }}*10000 ))
+            ./pst $S sol_$S.txt 780 > out_$S.txt &
+          done
+          wait || true
+          cat out_*.txt
+      - name: report
+        if: always()
+        run: |
+          mkdir -p /tmp/res; cat out_*.txt > /tmp/res/job${{ matrix.job }}_r${{ github.run_number }}.txt; cp sol_*.txt /tmp/res/ 2>/dev/null || true
+          git config user.name bot; git config user.email bot@users.noreply.github.com
+          for n in 1 2 3 4 5 6 7 8; do
+            git fetch -q origin results && git checkout -qf -B results origin/results
+            mkdir -p res; cp /tmp/res/* res/
+            git add -f res/ && git commit -qm "job ${{ matrix.job }}" && git push -q origin results && break
+            sleep $((RANDOM%10+2))
+          done
